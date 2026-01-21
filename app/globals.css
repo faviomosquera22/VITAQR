@@ -1,0 +1,99 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 243 246 255;
+  --text: 15 23 42;
+  --muted: 100 116 139;
+
+  --blue: 59 130 246;
+  --blue2: 37 99 235;
+
+  --red: 239 68 68;
+  --orange: 249 115 22;
+  --yellow: 234 179 8;
+  --green: 34 197 94;
+  --triBlue: 59 130 246;
+}
+
+html, body { height: 100%; }
+
+body {
+  color: rgb(var(--text));
+  background: rgb(var(--bg));
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+}
+
+@layer components {
+  .ios-card {
+    @apply rounded-3xl border border-slate-200/70 bg-white shadow-[0_10px_30px_rgba(2,6,23,.06)];
+  }
+
+  .ios-card-soft {
+    @apply rounded-3xl border border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-[0_18px_50px_rgba(2,6,23,.10)];
+  }
+
+  .ios-pill-row {
+    @apply w-full rounded-2xl bg-slate-100 px-4 py-4 text-left text-base font-semibold transition active:scale-[0.99];
+  }
+
+  .ios-pill-row-on {
+    @apply bg-white border border-blue-200 shadow-sm;
+  }
+
+  .ios-btn {
+    @apply rounded-2xl px-4 py-3 font-semibold transition active:scale-[0.98];
+  }
+
+  .ios-btn-primary {
+    @apply ios-btn text-white;
+    background: linear-gradient(135deg, rgb(var(--blue)) 0%, rgb(var(--blue2)) 100%);
+    box-shadow: 0 18px 34px rgba(37, 99, 235, .22);
+  }
+
+  .ios-btn-secondary {
+    @apply ios-btn bg-slate-100 text-slate-700;
+  }
+
+  .ios-input {
+    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none;
+  }
+
+  .segmented {
+    @apply rounded-full bg-slate-100 p-1 flex gap-1;
+  }
+
+  .segment {
+    @apply flex-1 rounded-full py-2 text-center text-sm font-semibold transition;
+  }
+
+  .segment-on {
+    @apply bg-white shadow-sm;
+  }
+
+  .choice-tile {
+    @apply w-full rounded-2xl bg-slate-100 px-4 py-4 text-left text-sm font-semibold transition active:scale-[0.99];
+  }
+
+  .choice-tile-on {
+    @apply bg-white border border-slate-200 shadow-sm;
+  }
+
+  .choice-tile-blue {
+    @apply bg-blue-500 text-white border border-blue-500 shadow-[0_14px_30px_rgba(37,99,235,.20)];
+  }
+
+  .divider { @apply h-px w-full bg-slate-200/70; }
+
+  .footer-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 12px); }
+
+  .bottom-toolbar {
+    @apply sticky bottom-0 z-10 mt-6;
+    padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+  }
+
+  .bottom-toolbar-surface {
+    @apply rounded-[32px] border border-slate-200/70 bg-white/75 backdrop-blur-xl shadow-[0_20px_50px_rgba(2,6,23,.12)] px-4 py-4;
+  }
+}
