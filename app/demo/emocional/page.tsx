@@ -50,10 +50,10 @@ function tile(active: boolean) {
 
 function scoreFromAnswers(a: Record<string, Answer>) {
   let s = 0;
-  if (a.sleep === "0") s += 1;
-  if (a.stress === "1") s += 1;
-  if (a.energy === "0") s += 1;
-  if (a.support === "0") s += 1;
+  if (a.sleep === "0") s += 1;   // mal sueño
+  if (a.stress === "1") s += 1;  // estrés alto
+  if (a.energy === "0") s += 1;  // poca energía
+  if (a.support === "0") s += 1; // sin apoyo
   return s; // 0..4
 }
 
@@ -68,7 +68,7 @@ export default function EmocionalPage() {
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
   const [showResult, setShowResult] = useState(false);
 
-  // Carga (por si vuelves a la página)
+  // Cargar si ya había algo guardado
   useEffect(() => {
     try {
       const m = sessionStorage.getItem("vita_emotional_mood_v1");
@@ -96,7 +96,7 @@ export default function EmocionalPage() {
     if (risk === "alto") {
       return [
         "Contacta a alguien de confianza hoy (mensaje o llamada).",
-        "Haz una pausa: respiración 4–6 por 2 minutos.",
+        "Pausa breve: respiración 4–6 por 2 minutos.",
         "Si sientes riesgo de hacerte daño o perder control: busca ayuda inmediata.",
       ];
     }
@@ -122,12 +122,32 @@ export default function EmocionalPage() {
     } catch {}
   }
 
+  function onPickMood(id: string) {
+    setMood(id);
+    setShowResult(false);
+    try {
+      sessionStorage.setItem("vita_emotional_mood_v1", id);
+    } catch {}
+
+    // UX pro: al elegir estado, baja suave a preguntas
+    setTimeout(() => {
+      const el = document.getElementById("emocional-questions");
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
+  }
+
   function openResult() {
     try {
       sessionStorage.setItem("vita_emotional_mood_v1", mood);
       sessionStorage.setItem("vita_emotional_answers_v1", JSON.stringify(answers));
     } catch {}
     setShowResult(true);
+
+    // Baja suave al resultado
+    setTimeout(() => {
+      const el = document.getElementById("emocional-result");
+      el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 150);
   }
 
   function reset() {
@@ -163,7 +183,7 @@ export default function EmocionalPage() {
                 key={m.id}
                 type="button"
                 aria-pressed={active}
-                onClick={() => setMood(m.id)}
+                onClick={() => onPickMood(m.id)}
                 className={`ios-pill-row ${active ? "ios-pill-row-on" : ""}`}
               >
                 <div className="flex items-center justify-between gap-3">
@@ -179,57 +199,73 @@ export default function EmocionalPage() {
         </div>
       </div>
 
-      {/* 2) Preguntas rápidas */}
-      <div className="mt-5 ios-card p-5">
-        <p className="text-lg font-semibold">Preguntas rápidas</p>
-        <p className="mt-1 text-sm text-slate-500">Sí / No. Para afinar la orientación.</p>
+      {/* 2) Preguntas rápidas (solo cuando ya eligió estado) */}
+      {mood ? (
+        <div id="emocional-questions" className="mt-5 ios-card p-5">
+          <p className="text-lg font-semibold">Preguntas rápidas</p>
+          <p className="mt-1 text-sm text-slate-500">Sí / No. Para afinar la orientación.</p>
 
-        <div className="mt-4 grid gap-4">
-          {QUESTIONS.map((q) => {
-            const v = answers[q.id];
-            return (
-              <div key={q.id} className="rounded-3xl border border-slate-200/70 bg-white p-4">
-                <p className="text-sm font-semibold text-slate-800">{q.title}</p>
-                <p className="mt-1 text-sm text-slate-500">{q.desc}</p>
+          <div className="mt-4 grid gap-4">
+            {QUESTIONS.map((q) => {
+              const v = answers[q.id];
+              return (
+                <div key={q.id} className="rounded-3xl border border-slate-200/70 bg-white p-4">
+                  <p className="text-sm font-semibold text-slate-800">{q.title}</p>
+                  <p className="mt-1 text-sm text-slate-500">{q.desc}</p>
 
-                <div className="mt-3 grid grid-cols-2 gap-3">
-                  <button type="button" className={tile(v === q.a.id)} onClick={() => setAnswer(q.id, q.a.id)}>
-                    {q.a.label}
-                  </button>
-                  <button type="button" className={tile(v === q.b.id)} onClick={() => setAnswer(q.id, q.b.id)}>
-                    {q.b.label}
-                  </button>
+                  <div className="mt-3 grid grid-cols-2 gap-3">
+                    <button
+                      type="button"
+                      className={tile(v === q.a.id)}
+                      onClick={() => setAnswer(q.id, q.a.id)}
+                    >
+                      {q.a.label}
+                    </button>
+                    <button
+                      type="button"
+                      className={tile(v === q.b.id)}
+                      onClick={() => setAnswer(q.id, q.b.id)}
+                    >
+                      {q.b.label}
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
+
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <Link href="/demo" className="ios-btn-secondary w-full text-center">
+              Volver
+            </Link>
+
+            <button
+              type="button"
+              className={`w-full text-center ${completed ? "ios-btn-primary" : "ios-btn-secondary opacity-60"}`}
+              disabled={!completed}
+              onClick={openResult}
+            >
+              Ver resultado
+            </button>
+          </div>
+
+          <p className="mt-3 text-xs text-slate-400 leading-relaxed">
+            Si sientes peligro inmediato, busca ayuda de emergencia.
+          </p>
         </div>
-
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          <Link href="/demo" className="ios-btn-secondary w-full text-center">
-            Volver
-          </Link>
-
-          <button
-            type="button"
-            className={`w-full text-center ${completed ? "ios-btn-primary" : "ios-btn-secondary opacity-60"}`}
-            disabled={!completed}
-            onClick={openResult}
-          >
-            Ver resultado
-          </button>
+      ) : (
+        <div className="mt-5 ios-card-soft p-5">
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Elige cómo te sientes y te haré 4 preguntas cortas para afinar la orientación.
+          </p>
         </div>
+      )}
 
-        <p className="mt-3 text-xs text-slate-400 leading-relaxed">
-          Si sientes peligro inmediato, busca ayuda de emergencia.
-        </p>
-      </div>
-
-      {/* RESULTADO (mismo screen, sin nueva ruta) */}
-      {showResult ? (
-        <div className="mt-5 ios-card p-5">
+      {/* 3) Resultado (solo cuando completed + showResult) */}
+      {showResult && completed ? (
+        <div id="emocional-result" className="mt-5 ios-card p-5">
           <p className="text-sm text-slate-500">Resultado</p>
-          <p className="mt-1 text-xl font-semibold capitalize">{mood || "—"}</p>
+          <p className="mt-1 text-xl font-semibold capitalize">{mood}</p>
 
           <div className="mt-3">
             <span className={badge.cls}>{badge.label}</span>
