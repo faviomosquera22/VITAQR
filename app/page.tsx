@@ -13,29 +13,23 @@ export default function Page() {
       </div>
 
       <div className="mt-5 ios-card p-5">
-        <p className="text-lg font-semibold">¿Cómo quieres entrar?</p>
+        <p className="text-lg font-semibold">Elige tu rol</p>
         <p className="mt-1 text-sm text-slate-500">
-          Elige un rol para explorar el demo.
+          Selecciona cómo quieres probar el demo.
         </p>
 
         <div className="mt-4 grid gap-3">
           <Link href="/demo" className="ios-btn-primary w-full text-center">
-            Entrar como Paciente
+            Paciente
           </Link>
 
           <Link href="/pro" className="ios-btn-secondary w-full text-center">
-            Entrar como Profesional
+            Profesional
           </Link>
         </div>
-      </div>
 
-      <div className="mt-5 ios-card p-5">
-        <p className="text-sm font-semibold">Ruta recomendada (WOW)</p>
-        <p className="mt-2 text-sm text-slate-600 leading-relaxed">
-          Triage → Resultado → Centros cercanos / 911 → Presión arterial → Medicación → Exámenes.
-        </p>
-        <p className="mt-3 text-xs text-slate-400">
-          Nota: Vita orienta y organiza. No reemplaza una valoración médica presencial.
+        <p className="mt-4 text-xs text-slate-400 leading-relaxed">
+          Vita orienta y organiza. No reemplaza una valoración médica presencial.
         </p>
       </div>
     </PhoneFrame>
