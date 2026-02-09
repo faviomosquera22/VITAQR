@@ -48,10 +48,27 @@ function tile(active: boolean) {
   return `choice-tile ${active ? "choice-tile-on" : ""}`;
 }
 
+function scoreFromAnswers(a: Record<string, Answer>) {
+  let s = 0;
+  if (a.sleep === "0") s += 1;
+  if (a.stress === "1") s += 1;
+  if (a.energy === "0") s += 1;
+  if (a.support === "0") s += 1;
+  return s; // 0..4
+}
+
+function level(score: number) {
+  if (score >= 3) return "alto";
+  if (score === 2) return "medio";
+  return "bajo";
+}
+
 export default function EmocionalPage() {
   const [mood, setMood] = useState<string>("");
   const [answers, setAnswers] = useState<Record<string, Answer>>({});
+  const [showResult, setShowResult] = useState(false);
 
+  // Carga (por si vuelves a la página)
   useEffect(() => {
     try {
       const m = sessionStorage.getItem("vita_emotional_mood_v1");
@@ -66,6 +83,37 @@ export default function EmocionalPage() {
     return QUESTIONS.every((q) => answers[q.id] === "0" || answers[q.id] === "1");
   }, [answers, mood]);
 
+  const score = useMemo(() => scoreFromAnswers(answers), [answers]);
+  const risk = useMemo(() => level(score), [score]);
+
+  const badge = useMemo(() => {
+    if (risk === "alto") return { cls: "tri-badge tri-orange", label: "Prioridad media-alta" };
+    if (risk === "medio") return { cls: "tri-badge tri-yellow", label: "Prioridad moderada" };
+    return { cls: "tri-badge tri-green", label: "Prioridad baja" };
+  }, [risk]);
+
+  const plan = useMemo(() => {
+    if (risk === "alto") {
+      return [
+        "Contacta a alguien de confianza hoy (mensaje o llamada).",
+        "Haz una pausa: respiración 4–6 por 2 minutos.",
+        "Si sientes riesgo de hacerte daño o perder control: busca ayuda inmediata.",
+      ];
+    }
+    if (risk === "medio") {
+      return [
+        "Plan de 20 minutos: caminar suave, estirar o ducha tibia.",
+        "Reduce pantallas 30–60 min antes de dormir.",
+        "Escribe 3 cosas pequeñas que sí puedes resolver hoy.",
+      ];
+    }
+    return [
+      "Respiración 4–6 por 2 minutos.",
+      "Pausa de pantalla + hidratación.",
+      "Si se repite varios días, considera hablar con un profesional.",
+    ];
+  }, [risk]);
+
   function setAnswer(id: string, v: Answer) {
     const next = { ...answers, [id]: v };
     setAnswers(next);
@@ -74,12 +122,22 @@ export default function EmocionalPage() {
     } catch {}
   }
 
-  function goResult() {
+  function openResult() {
     try {
       sessionStorage.setItem("vita_emotional_mood_v1", mood);
       sessionStorage.setItem("vita_emotional_answers_v1", JSON.stringify(answers));
     } catch {}
-    window.location.href = "/demo/emocional/resultado";
+    setShowResult(true);
+  }
+
+  function reset() {
+    setMood("");
+    setAnswers({});
+    setShowResult(false);
+    try {
+      sessionStorage.removeItem("vita_emotional_mood_v1");
+      sessionStorage.removeItem("vita_emotional_answers_v1");
+    } catch {}
   }
 
   return (
@@ -124,9 +182,7 @@ export default function EmocionalPage() {
       {/* 2) Preguntas rápidas */}
       <div className="mt-5 ios-card p-5">
         <p className="text-lg font-semibold">Preguntas rápidas</p>
-        <p className="mt-1 text-sm text-slate-500">
-          Sí / No. Para afinar la orientación.
-        </p>
+        <p className="mt-1 text-sm text-slate-500">Sí / No. Para afinar la orientación.</p>
 
         <div className="mt-4 grid gap-4">
           {QUESTIONS.map((q) => {
@@ -158,7 +214,7 @@ export default function EmocionalPage() {
             type="button"
             className={`w-full text-center ${completed ? "ios-btn-primary" : "ios-btn-secondary opacity-60"}`}
             disabled={!completed}
-            onClick={goResult}
+            onClick={openResult}
           >
             Ver resultado
           </button>
@@ -168,6 +224,43 @@ export default function EmocionalPage() {
           Si sientes peligro inmediato, busca ayuda de emergencia.
         </p>
       </div>
+
+      {/* RESULTADO (mismo screen, sin nueva ruta) */}
+      {showResult ? (
+        <div className="mt-5 ios-card p-5">
+          <p className="text-sm text-slate-500">Resultado</p>
+          <p className="mt-1 text-xl font-semibold capitalize">{mood || "—"}</p>
+
+          <div className="mt-3">
+            <span className={badge.cls}>{badge.label}</span>
+          </div>
+
+          <p className="mt-3 text-sm text-slate-600 leading-relaxed">
+            Orientación basada en tus respuestas. No es diagnóstico.
+          </p>
+
+          <p className="mt-5 text-lg font-semibold">Tu plan inmediato</p>
+          <ul className="mt-3 list-disc pl-5 text-sm text-slate-700 space-y-2">
+            {plan.map((t, i) => (
+              <li key={i}>{t}</li>
+            ))}
+          </ul>
+
+          <div className="mt-5 grid gap-3">
+            <a className="ios-btn-primary w-full text-center" href="tel:911">
+              Llamar 911
+            </a>
+
+            <button type="button" className="ios-btn-secondary w-full text-center" onClick={reset}>
+              Reiniciar chequeo
+            </button>
+          </div>
+
+          <p className="mt-3 text-xs text-slate-400">
+            Si sientes peligro inmediato, llama a emergencias o acude a un servicio cercano.
+          </p>
+        </div>
+      ) : null}
     </PhoneFrame>
   );
 }
