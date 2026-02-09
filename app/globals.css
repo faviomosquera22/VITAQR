@@ -2,64 +2,124 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =========================================================
+   VITA — Global Design Tokens (iOS-like)
+   ========================================================= */
 :root {
-  --bg: 243 246 255;
-  --text: 15 23 42;
-  --muted: 100 116 139;
+  /* Base */
+  --bg: 244 247 255;   /* fondo app */
+  --text: 15 23 42;    /* slate-900 */
+  --muted: 100 116 139;/* slate-500 */
 
-  --blue: 59 130 246;
-  --blue2: 37 99 235;
+  /* Brand */
+  --blue: 59 130 246;  /* blue-500 */
+  --blue2: 37 99 235;  /* blue-600 */
 
-  --red: 239 68 68;
-  --orange: 249 115 22;
-  --yellow: 234 179 8;
-  --green: 34 197 94;
-  --triBlue: 59 130 246;
+  /* Triage colors */
+  --tri-red: 239 68 68;     /* red-500 */
+  --tri-orange: 249 115 22; /* orange-500 */
+  --tri-yellow: 234 179 8;  /* amber-500 */
+  --tri-green: 34 197 94;   /* green-500 */
+  --tri-blue: 59 130 246;   /* blue-500 */
+
+  /* Surfaces */
+  --card: 255 255 255;
+  --glass: 255 255 255;
 }
 
-html, body { height: 100%; }
+html,
+body {
+  height: 100%;
+}
 
 body {
   color: rgb(var(--text));
   background: rgb(var(--bg));
-  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display", "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+  font-family: ui-sans-serif, system-ui, -apple-system, "SF Pro Display",
+    "SF Pro Text", Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji",
+    "Segoe UI Emoji";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
+/* Avoid annoying tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* =========================================================
+   Components
+   ========================================================= */
 @layer components {
+  /* Cards */
   .ios-card {
-    @apply rounded-3xl border border-slate-200/70 bg-white shadow-[0_10px_30px_rgba(2,6,23,.06)];
+    @apply rounded-3xl border border-slate-200/70 bg-white;
+    box-shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
   }
 
   .ios-card-soft {
-    @apply rounded-3xl border border-slate-200/60 bg-white/80 backdrop-blur-xl shadow-[0_18px_50px_rgba(2,6,23,.10)];
+    @apply rounded-3xl border border-slate-200/60 bg-white/80 backdrop-blur-xl;
+    box-shadow: 0 18px 50px rgba(2, 6, 23, 0.1);
   }
 
+  /* Section title */
+  .ios-section-title {
+    @apply text-xl font-semibold text-slate-900;
+  }
+
+  .ios-section-subtitle {
+    @apply text-sm text-slate-500;
+  }
+
+  /* Inputs */
+  .ios-input {
+    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none;
+  }
+  .ios-input:focus {
+    box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.12);
+    border-color: rgba(37, 99, 235, 0.55);
+  }
+
+  /* Buttons */
+  .ios-btn {
+    @apply rounded-3xl px-5 py-4 font-semibold transition active:scale-[0.98];
+  }
+
+  .ios-btn-primary {
+    @apply ios-btn text-white;
+    background: linear-gradient(
+      135deg,
+      rgb(var(--blue)) 0%,
+      rgb(var(--blue2)) 100%
+    );
+    box-shadow: 0 18px 34px rgba(37, 99, 235, 0.22);
+  }
+
+  .ios-btn-secondary {
+    @apply ios-btn bg-slate-100 text-slate-700;
+    box-shadow: 0 10px 22px rgba(2, 6, 23, 0.05);
+  }
+
+  /* Pills (rows) */
   .ios-pill-row {
     @apply w-full rounded-2xl bg-slate-100 px-4 py-4 text-left text-base font-semibold transition active:scale-[0.99];
   }
 
   .ios-pill-row-on {
-    @apply bg-white border border-blue-200 shadow-sm;
+    @apply bg-white border border-blue-200;
+    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.1);
   }
 
-  .ios-btn {
-    @apply rounded-2xl px-4 py-3 font-semibold transition active:scale-[0.98];
+  /* Chips */
+  .ios-chip {
+    @apply rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold transition active:scale-[0.98];
   }
 
-  .ios-btn-primary {
-    @apply ios-btn text-white;
-    background: linear-gradient(135deg, rgb(var(--blue)) 0%, rgb(var(--blue2)) 100%);
-    box-shadow: 0 18px 34px rgba(37, 99, 235, .22);
+  .ios-chip-on {
+    @apply border-blue-200 bg-blue-50 text-blue-700;
   }
 
-  .ios-btn-secondary {
-    @apply ios-btn bg-slate-100 text-slate-700;
-  }
-
-  .ios-input {
-    @apply w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm outline-none;
-  }
-
+  /* Segmented Control */
   .segmented {
     @apply rounded-full bg-slate-100 p-1 flex gap-1;
   }
@@ -72,6 +132,7 @@ body {
     @apply bg-white shadow-sm;
   }
 
+  /* Tiles (antecedentes, zonas, etc.) */
   .choice-tile {
     @apply w-full rounded-2xl bg-slate-100 px-4 py-4 text-left text-sm font-semibold transition active:scale-[0.99];
   }
@@ -81,12 +142,19 @@ body {
   }
 
   .choice-tile-blue {
-    @apply bg-blue-500 text-white border border-blue-500 shadow-[0_14px_30px_rgba(37,99,235,.20)];
+    @apply bg-blue-500 text-white border border-blue-500;
+    box-shadow: 0 14px 30px rgba(37, 99, 235, 0.2);
   }
 
-  .divider { @apply h-px w-full bg-slate-200/70; }
+  /* Divider */
+  .divider {
+    @apply h-px w-full bg-slate-200/70;
+  }
 
-  .footer-safe { padding-bottom: calc(env(safe-area-inset-bottom) + 12px); }
+  /* Bottom toolbar (iOS sheet style) */
+  .footer-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 12px);
+  }
 
   .bottom-toolbar {
     @apply sticky bottom-0 z-10 mt-6;
@@ -95,5 +163,31 @@ body {
 
   .bottom-toolbar-surface {
     @apply rounded-[32px] border border-slate-200/70 bg-white/75 backdrop-blur-xl shadow-[0_20px_50px_rgba(2,6,23,.12)] px-4 py-4;
+  }
+
+  /* Triage badge */
+  .tri-badge {
+    @apply inline-flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold border;
+  }
+
+  .tri-red {
+    @apply text-red-700 border-red-200;
+    background: rgba(239, 68, 68, 0.08);
+  }
+  .tri-orange {
+    @apply text-orange-700 border-orange-200;
+    background: rgba(249, 115, 22, 0.08);
+  }
+  .tri-yellow {
+    @apply text-amber-700 border-amber-200;
+    background: rgba(234, 179, 8, 0.1);
+  }
+  .tri-green {
+    @apply text-emerald-700 border-emerald-200;
+    background: rgba(34, 197, 94, 0.09);
+  }
+  .tri-blue {
+    @apply text-blue-700 border-blue-200;
+    background: rgba(59, 130, 246, 0.09);
   }
 }
